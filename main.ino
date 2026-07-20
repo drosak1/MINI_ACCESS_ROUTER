@@ -221,9 +221,7 @@ bool validateTelemetryRequest()
     const char *requiredParameters[] =
     {
         "ID",
-        "value",
-        "description",
-        "unit"
+        "RSSI"
     };
 
     const size_t parameterCount =
@@ -241,6 +239,9 @@ bool validateTelemetryRequest()
                 String("Brak parametru: ") + parameter
             );
 
+            Serial.print("Brak parametru: ");
+            Serial.println(parameter);
+
             return false;
         }
 
@@ -250,6 +251,8 @@ bool validateTelemetryRequest()
                 400,
                 String("Pusty parametr: ") + parameter
             );
+            Serial.print("Pusty parametr: ");
+            Serial.println(parameter);
 
             return false;
         }
@@ -270,6 +273,7 @@ void handleSetRequest()
 {
     if (!validateTelemetryRequest())
     {
+        Serial.println("error -> validateTelemetryRequest()");
         return;
     }
 
