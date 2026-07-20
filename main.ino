@@ -14,6 +14,8 @@
 
 //http://192.168.50.1/status
 //http://192.168.50.1/set.php?ID=1234&value=34&description=cisnienie&unit=stC&timezone=Europe%2FLondon
+//nowe oznaczenia -> V-value, D-description, U-unit
+//http://192.168.50.1/set.php?ID=1234&V=34&D=cisnienie&U=stC&timezone=Europe%2FLondon
 
 /* =========================================================
    KONFIGURACJA ACCESS POINT
