@@ -17,6 +17,9 @@
 //nowe oznaczenia -> V-value, D-description, U-unit
 //http://192.168.50.1/set.php?ID=1234&V=34&D=cisnienie&U=stC&timezone=Europe%2FLondon
 
+//odpytanie czasu
+//http://dlb.com.pl/api/v2/set.php?ID=TIME
+
 /* =========================================================
    KONFIGURACJA ACCESS POINT
    ========================================================= */
@@ -1087,7 +1090,15 @@ void setup()
     Serial.println("Zakonczona inicjalizacja modulu NBiOT");    
 
     //synchronizuj zegar
-    
+    //http://dlb.com.pl/api/v2/set.php?ID=TIME
+    char url[200];
+    snprintf(url, sizeof(url), "AT+HTTPPARA=\"URL\",\"dlb.com.pl/api/v2/set.php?ID=TIME&IMSI=%s&KEY=%s&IP=%s\"",GSM_dev.my_IMSI, KEY, GSM_dev.IP);
+    Serial.println("synchronizuj zegar :");
+    Serial.println(url);
+    if(GSM_dev.http_get_(url))  {
+            Serial.println("htt_get_(TIME) OK                     ;-) !");
+            setRouterTime(GSM_dev.serverEpoch);
+    }
     //setRouterTime(GSM_dev.serverEpoch);
     //setRouterTime(unsigned long epoch);
 
