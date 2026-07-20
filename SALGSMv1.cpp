@@ -169,6 +169,21 @@ bool SALGSMv1::http_get_(const char* cmd){
   if(strstr(response, "OK") == NULL) this->STATUS == false;  
   delay(2000);
   if(strstr(response, "SETOK") != NULL) status = true; //<-tutaj odpowiedz z serwera
+  if(status==true){
+    if(czas_unix==false){
+    
+      if(extractTS(response)){
+        czas_unix=true;
+        Serial.println("[TS] czas_unix = true");
+      }
+      else{
+        czas_unix=false;
+        Serial.println("[TS] czas_unix = false");
+      }
+    }
+  }else{
+    Serial.println("[TS] error status == false !");
+  }
 
   this->clear(response, sizeof(response));
   this->sendAT("AT+HTTPTERM", response, sizeof(response), 2000);
@@ -245,6 +260,51 @@ void SALGSMv1::setDEBUG(bool state){
   this->DEBUG = state;
 }
 
+bool SALGSMv1::extractTS(const char* resp)
+{
+  if (resp == NULL) {
+    return false;
+  }
+
+  const char* key = strstr(resp, "\"TS\"");
+
+  if (key == NULL) {
+    key = strstr(resp, "TS");
+  }
+
+  if (key == NULL) {
+    return false;
+  }
+
+  const char* colon = strchr(key, ':');
+
+  if (colon == NULL) {
+    return false;
+  }
+
+  colon++;
+
+  while (*colon == ' ' || *colon == '\t') {
+    colon++;
+  }
+
+  if (*colon < '0' || *colon > '9') {
+    return false;
+  }
+
+  char* endPtr = NULL;
+  unsigned long value = strtoull(colon, &endPtr, 10);
+
+  if (endPtr == colon) {
+    return false;
+  }
+
+  this->serverEpoch = value;
+  if (DEBUG) Serial.print("TS serverEpoch -> ");
+  if (DEBUG) Serial.println(this->serverEpoch);
+  //ts = static_cast<unsigned long>(value);
+  return true;
+}
 
 // void SALGSMv1::extractHttpData(String raw) {
 //   int start = raw.indexOf("+HTTPREAD:");

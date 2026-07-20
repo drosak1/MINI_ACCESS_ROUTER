@@ -152,6 +152,27 @@ String urlEncode(const String &value)
     return encoded;
 }
 
+bool routerTimeValid = false;
+unsigned long routerEpochAtSync = 0;
+unsigned long routerMillisAtSync = 0;
+
+void setRouterTime(unsigned long epoch)
+{
+    routerEpochAtSync = epoch;
+    routerMillisAtSync = millis();
+    routerTimeValid = true;
+}
+
+unsigned long getRouterUnixTime()
+{
+    if (!routerTimeValid)
+    {
+        return 0;
+    }
+
+    return routerEpochAtSync + ((millis() - routerMillisAtSync) / 1000);
+}
+
 /* =========================================================
    BUDOWANIE PELNEGO LINKU
    ========================================================= */
@@ -182,6 +203,9 @@ String buildQueuedRequest()
         request += '=';
         request += urlEncode(server.arg(i));
     }
+
+    request += "&TS=";
+    request += String(getRouterUnixTime());
 
     return request;
 }
@@ -1052,6 +1076,19 @@ void setup()
         "Status: http://192.168.50.1/status"
     );
 
+    Serial.println("Inicjalizacja modulu NBiOT moze potrwac 15 sekund ...");
+        digitalWrite(GSM_RST, LOW);
+        delay(100);
+        digitalWrite(GSM_RST, HIGH);
+        delay(15000);
+        GSM_dev.init();
+    Serial.println("Zakonczona inicjalizacja modulu NBiOT");    
+
+    //synchronizuj zegar
+    
+    //setRouterTime(GSM_dev.serverEpoch);
+    //setRouterTime(unsigned long epoch);
+
     /*
      * Utworzenie osobnego tasku UART.
      */
@@ -1084,13 +1121,6 @@ void setup()
         "Gateway gotowy do pracy"
     );
 
-    Serial.println("Inicjalizacja modulu NBiOT moze potrwac 15 sekund ...");
-        digitalWrite(GSM_RST, LOW);
-        delay(100);
-        digitalWrite(GSM_RST, HIGH);
-        delay(15000);
-        GSM_dev.init();
-    Serial.println("Zakonczona inicjalizacja modulu NBiOT");     
 }
 
 /* =========================================================

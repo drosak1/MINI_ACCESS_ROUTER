@@ -23,6 +23,7 @@ public:
   bool http_get_(const char* cmd);
 
   const char* extractID(const char* resp);
+  bool extractTS(const char* resp);
   //const char* IMSI(void);
   bool reset_(void);
   bool isModuleAlive(void);
@@ -34,12 +35,14 @@ public:
   char my_APN [100] = {0};
   char IP [20] = {0};
 
+  unsigned long serverEpoch = 0; //czas unix czytaj jeden raz
+
 private:
   bool DEBUG = true;
   bool STATUS = false;
-
+  
+  bool czas_unix = false;
   Stream* my_serial;
-
 };
 
 #endif
