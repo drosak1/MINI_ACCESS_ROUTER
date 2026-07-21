@@ -303,7 +303,7 @@ void handleSetRequest()
     if (!validateTelemetryRequest())
     {
         Serial.println("error -> validateTelemetryRequest()");
-        return;
+        //return;
     }
 
     if (telemetryQueue == NULL)
@@ -1092,7 +1092,7 @@ void setup()
     //synchronizuj zegar
     //http://dlb.com.pl/api/v2/set.php?ID=TIME
     char url[200];
-    snprintf(url, sizeof(url), "AT+HTTPPARA=\"URL\",\"dlb.com.pl/api/v2/set.php?ID=TIME&IMSI=%s&KEY=%s&IP=%s\"",GSM_dev.my_IMSI, KEY, GSM_dev.IP);
+    snprintf(url, sizeof(url), "AT+HTTPPARA=\"URL\",\"dlb.com.pl/api/tlm/v2/set.php?ID=TIME&IMSI=%s&KEY=%s&IP=%s\"",GSM_dev.my_IMSI, KEY, GSM_dev.IP);
     Serial.println("synchronizuj zegar :");
     Serial.println(url);
     if(GSM_dev.http_get_(url))  {

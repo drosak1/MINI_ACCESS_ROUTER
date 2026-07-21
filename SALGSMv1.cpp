@@ -137,7 +137,7 @@ bool SALGSMv1::con_to_internet(void){
 
 
 bool SALGSMv1::http_get_(const char* cmd){
-  char response[60] = {0};
+  char response[260] = {0};
   bool status = false;
   //url += "&lacDec="+String(this->lacDec)+"&cellDec="+String(this->cellDec)+"&netop="+this->network_operator;
 
@@ -166,6 +166,11 @@ bool SALGSMv1::http_get_(const char* cmd){
   
   this->clear(response, sizeof(response));
   this->sendAT("AT+HTTPREAD=0,100", response, sizeof(response), 5000);
+  //Serial.println(response);
+  if(strlen(response)<10) {
+    Serial.println("[WDT] strlen(response)<10");
+    esp_restart();
+    }
   if(strstr(response, "OK") == NULL) this->STATUS == false;  
   delay(2000);
   if(strstr(response, "SETOK") != NULL) status = true; //<-tutaj odpowiedz z serwera
@@ -192,6 +197,7 @@ bool SALGSMv1::http_get_(const char* cmd){
   if(this->STATUS == false) {
     //zapamietaj licznik w EEPROM
     //odp. zapemietany przed wysłaniem http
+    esp_restart();
     this->reset_();
   }
 
@@ -206,7 +212,7 @@ void SALGSMv1::sendAT(const char* cmd, char* out, size_t outSize, unsigned long 
   size_t idx = 0;
   //wdt_reset();
   this->my_serial->println(cmd);
-  if (DEBUG) Serial.write("[DEBUG] ");
+  if (DEBUG) Serial.write("[DEBUG][sendAT] my_serial->read() - ");
   unsigned long start = millis();
   while (millis() - start < timeout) {
     while (this->my_serial->available()) {
@@ -219,7 +225,7 @@ void SALGSMv1::sendAT(const char* cmd, char* out, size_t outSize, unsigned long 
     }
     //wdt_reset();
   }
-  if (DEBUG) Serial.write("[DEBUG END] ");
+  if (DEBUG) Serial.println("[DEBUG END][sendAT]");
   out[idx] = '\0'; // ✅ zakończenie stringa
 
   // if (strstr(input, "+HTTPREAD") != NULL) {
@@ -272,6 +278,11 @@ bool SALGSMv1::extractTS(const char* resp)
     key = strstr(resp, "TS");
   }
 
+  Serial.print("[extractTS] rep-");
+  Serial.print(resp);
+  Serial.print(" key-");
+  Serial.println(key);
+
   if (key == NULL) {
     return false;
   }
@@ -300,7 +311,7 @@ bool SALGSMv1::extractTS(const char* resp)
   }
 
   this->serverEpoch = value;
-  if (DEBUG) Serial.print("TS serverEpoch -> ");
+  if (DEBUG) Serial.print("[TS] serverEpoch -> ");
   if (DEBUG) Serial.println(this->serverEpoch);
   //ts = static_cast<unsigned long>(value);
   return true;
