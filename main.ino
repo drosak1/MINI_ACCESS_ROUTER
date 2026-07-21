@@ -42,9 +42,10 @@ const char *KEY = "999"; //klucz dostepu
 /*
  * Maksymalny czas bez odświeżenia watchdoga.
  *
- * Task UART działa co 30 sekund, dlatego ustawiamy 60 sekund.
+ * Task UART działa co 30 sekund, a inicjalizacja modemu może trwać
+ * ponad minutę, dlatego ustawiamy 120 sekund.
  */
-#define WATCHDOG_TIMEOUT_MS 60000
+#define WATCHDOG_TIMEOUT_MS 120000
 
 
 /*
